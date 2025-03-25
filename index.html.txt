@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória - Frutas</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #060AB2;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .memory-game {
+            width: 640px;
+            height: 640px;
+            display: flex;
+            flex-wrap: wrap;
+            perspective: 1000px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            width: calc(25% - 10px);
+            height: calc(33.333% - 10px);
+            margin: 5px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+
+        .memory-card:active {
+            transform: scale(0.97);
+        }
+
+        .memory-card.flip {
+            transform: rotateY(180deg);
+        }
+
+        .front-face,
+        .back-face {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            position: absolute;
+            border-radius: 5px;
+            background: #1C7CCC;
+            backface-visibility: hidden;
+            object-fit: contain;
+        }
+
+        .front-face {
+            transform: rotateY(180deg);
+            background: white;
+        }
+
+        .back-face {
+            background: #1C7CCC;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Memória - Frutas</h1>
+    <section class="memory-game">
+        <!-- Par 1: Morango -->
+        <div class="memory-card" data-framework="morango">
+            <img class="front-face" src="img/morango.svg" alt="Morango">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="morango">
+            <img class="front-face" src="img/morango.svg" alt="Morango">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+
+        <!-- Par 2: Uva -->
+        <div class="memory-card" data-framework="uva">
+            <img class="front-face" src="img/uva.svg" alt="Uva">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="uva">
+            <img class="front-face" src="img/uva.svg" alt="Uva">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+
+        <!-- Par 3: Maracujá -->
+        <div class="memory-card" data-framework="maracuja">
+            <img class="front-face" src="img/maracuja.svg" alt="Maracujá">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="maracuja">
+            <img class="front-face" src="img/maracuja.svg" alt="Maracujá">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+
+        <!-- Par 4: Tamarindo -->
+        <div class="memory-card" data-framework="tamarindo">
+            <img class="front-face" src="img/tamarindo.svg" alt="Tamarindo">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="tamarindo">
+            <img class="front-face" src="img/tamarindo.svg" alt="Tamarindo">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+
+        <!-- Par 5: Manga -->
+        <div class="memory-card" data-framework="manga">
+            <img class="front-face" src="img/manga.svg" alt="Manga">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="manga">
+            <img class="front-face" src="img/manga.svg" alt="Manga">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+
+        <!-- Par 6: Laranja -->
+        <div class="memory-card" data-framework="laranja">
+            <img class="front-face" src="img/laranja.svg" alt="Laranja">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+        <div class="memory-card" data-framework="laranja">
+            <img class="front-face" src="img/laranja.svg" alt="Laranja">
+            <img class="back-face" src="img/back.svg" alt="Verso da Carta">
+        </div>
+    </section>
+
+    <script>
+        const cards = document.querySelectorAll('.memory-card');
+
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flip');
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            lockBoard = true;
+
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.framework === secondCard.dataset.framework;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+
+                resetBoard();
+            }, 1500);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        (function shuffle() {
+            cards.forEach(card => {
+                let randomPos = Math.floor(Math.random() * 12);
+                card.style.order = randomPos;
+            });
+        })();
+
+        cards.forEach(card => card.addEventListener('click', flipCard));
+    </script>
+</body>
+</html>
